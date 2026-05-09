@@ -44,16 +44,16 @@ const signals = [
 type ForecastRow = {
   id: number; product: string; base: string; final: string; finalNum: number;
   unit: string; change: string; risk?: string; expiry?: string; isNew?: boolean;
-  multipliers: number[]; baseNum: number;
+  multipliers: number[]; baseNum: number; stock?: number;
 };
 
 const INITIAL_ROWS: ForecastRow[] = [
-  { id: 1, product: "Sugar",      base: "20 kg",     final: "45 kg",     finalNum: 45, baseNum: 20, unit: "kg",    change: "up",      multipliers: [1.5, 1.2, 1.25] },
-  { id: 2, product: "Ghee",       base: "4 kg",      final: "8 kg",      finalNum: 8,  baseNum: 4,  unit: "kg",    change: "up",      multipliers: [1.5, 1.2] },
-  { id: 3, product: "Rice",       base: "15 kg",     final: "32 kg",     finalNum: 32, baseNum: 15, unit: "kg",    change: "up",      risk: "High Risk", multipliers: [1.5, 1.2, 1.25] },
+  { id: 1, product: "Sugar",      base: "20 kg",     final: "45 kg",     finalNum: 45, baseNum: 20, unit: "kg",    change: "up",      multipliers: [1.5, 1.2, 1.25], stock: 30 },
+  { id: 2, product: "Ghee",       base: "4 kg",      final: "8 kg",      finalNum: 8,  baseNum: 4,  unit: "kg",    change: "up",      multipliers: [1.5, 1.2],        stock: 12 },
+  { id: 3, product: "Rice",       base: "15 kg",     final: "32 kg",     finalNum: 32, baseNum: 15, unit: "kg",    change: "up",      risk: "High Risk", multipliers: [1.5, 1.2, 1.25], stock: 8 },
   { id: 4, product: "Bread",      base: "10 packs",  final: "10 packs",  finalNum: 10, baseNum: 10, unit: "packs", change: "neutral", expiry: "Expiry",  multipliers: [] },
   { id: 5, product: "Dry Fruits", base: "0 kg",      final: "5 kg",      finalNum: 5,  baseNum: 0,  unit: "kg",    change: "new",     isNew: true,       multipliers: [1.5] },
-  { id: 6, product: "Atta",       base: "25 kg",     final: "50 kg",     finalNum: 50, baseNum: 25, unit: "kg",    change: "up",      multipliers: [1.5, 1.2] },
+  { id: 6, product: "Atta",       base: "25 kg",     final: "50 kg",     finalNum: 50, baseNum: 25, unit: "kg",    change: "up",      multipliers: [1.5, 1.2],        stock: 55 },
 ];
 
 const multiplierMeta: Record<number, { label: string; colorClass: string }> = {
@@ -319,6 +319,86 @@ function DynamicBackground() {
   );
 }
 
+function StockCell({ row, onUpdate }: {
+  row: ForecastRow;
+  onUpdate: (id: number, stock: number | undefined) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(row.stock !== undefined ? String(row.stock) : "");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const commit = () => {
+    const val = draft.trim();
+    onUpdate(row.id, val === "" ? undefined : Math.max(0, parseFloat(val) || 0));
+    setEditing(false);
+  };
+
+  const stockNum = row.stock;
+  const needed = row.finalNum;
+  const pctCover = stockNum !== undefined && needed > 0 ? Math.round((stockNum / needed) * 100) : null;
+  const coverClass =
+    stockNum === undefined ? "text-muted-foreground" :
+    stockNum < needed * 0.5 ? "text-rose-600 dark:text-rose-400" :
+    stockNum < needed ? "text-amber-600 dark:text-amber-400" :
+    "text-emerald-600 dark:text-emerald-400";
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  if (editing) {
+    return (
+      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+        <Input
+          ref={inputRef}
+          type="number"
+          min="0"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => { if (e.key === "Enter") commit(); if (e.key === "Escape") setEditing(false); }}
+          className="h-7 w-20 text-xs text-right px-2"
+          style={{ fontFamily: FONT_MONO }}
+          placeholder="0"
+        />
+        <span className="text-[10px] text-muted-foreground">{row.unit}</span>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      className="group flex items-center justify-end gap-1.5 w-full hover:opacity-80 transition-opacity"
+      onClick={(e) => { e.stopPropagation(); setDraft(stockNum !== undefined ? String(stockNum) : ""); setEditing(true); }}
+      title="Click to edit stock"
+    >
+      {stockNum !== undefined ? (
+        <span className={`text-sm font-medium ${coverClass}`} style={{ fontFamily: FONT_MONO }}>
+          {stockNum} {row.unit}
+        </span>
+      ) : (
+        <span className="text-xs text-muted-foreground/50 italic">add stock</span>
+      )}
+      {pctCover !== null && (
+        <span className={`text-[9px] font-bold px-1 py-0.5 rounded ${
+          stockNum! < needed * 0.5
+            ? "bg-rose-100 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400"
+            : stockNum! < needed
+            ? "bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400"
+            : "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400"
+        }`} style={{ fontFamily: FONT_MONO }}>
+          {pctCover}%
+        </span>
+      )}
+      <span className="opacity-0 group-hover:opacity-50 transition-opacity">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+        </svg>
+      </span>
+    </button>
+  );
+}
+
 function AddProductModal({ open, onClose, onAdd }: {
   open: boolean;
   onClose: () => void;
@@ -326,6 +406,7 @@ function AddProductModal({ open, onClose, onAdd }: {
 }) {
   const [name, setName] = useState("");
   const [baseQty, setBaseQty] = useState("");
+  const [stockQty, setStockQty] = useState("");
   const [unit, setUnit] = useState("kg");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -334,20 +415,26 @@ function AddProductModal({ open, onClose, onAdd }: {
     const base = parseFloat(baseQty);
     const mults = [1.5, 1.2, 1.25];
     const finalNum = Math.round(base * mults.reduce((a, b) => a * b, 1));
+    const stock = stockQty.trim() !== "" ? Math.max(0, parseFloat(stockQty) || 0) : undefined;
     const newRow: ForecastRow = {
       id: Date.now(),
       product: name.trim(),
       base: `${base} ${unit}`,
       final: `${finalNum} ${unit}`,
-      finalNum, baseNum: base, unit,
+      finalNum, baseNum: base, unit, stock,
       change: finalNum > base ? "up" : "neutral",
       multipliers: mults,
       isNew: true,
     };
     onAdd(newRow);
-    setName(""); setBaseQty(""); setUnit("kg");
+    setName(""); setBaseQty(""); setStockQty(""); setUnit("kg");
     onClose();
   };
+
+  const forecastNum = baseQty && parseFloat(baseQty) > 0
+    ? Math.round(parseFloat(baseQty) * 1.5 * 1.2 * 1.25) : null;
+  const stockNum = stockQty.trim() !== "" ? parseFloat(stockQty) : null;
+  const coverPct = forecastNum && stockNum !== null ? Math.round((stockNum / forecastNum) * 100) : null;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -355,23 +442,28 @@ function AddProductModal({ open, onClose, onAdd }: {
         <DialogHeader>
           <DialogTitle style={{ fontFamily: FONT_PLAYFAIR, fontSize: "1.2rem" }}>Add Product</DialogTitle>
           <DialogDescription className="text-xs">
-            Add a new item — forecast will apply all active signal multipliers.
+            Add a new item — forecast applies all active signal multipliers.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+        <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
           <div className="space-y-1.5">
             <Label htmlFor="p-name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product Name</Label>
             <Input id="p-name" placeholder="e.g. Mustard Oil" value={name} onChange={(e) => setName(e.target.value)} autoFocus className="h-9" />
           </div>
+
           <div className="flex gap-3">
             <div className="space-y-1.5 flex-1">
-              <Label htmlFor="p-qty" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Base Quantity</Label>
+              <Label htmlFor="p-qty" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Base Qty</Label>
               <Input id="p-qty" type="number" min="0" placeholder="10" value={baseQty} onChange={(e) => setBaseQty(e.target.value)} className="h-9" />
+            </div>
+            <div className="space-y-1.5 flex-1">
+              <Label htmlFor="p-stock" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Current Stock</Label>
+              <Input id="p-stock" type="number" min="0" placeholder="optional" value={stockQty} onChange={(e) => setStockQty(e.target.value)} className="h-9" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Unit</Label>
               <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger className="w-24 h-9 text-sm">
+                <SelectTrigger className="w-20 h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -383,15 +475,42 @@ function AddProductModal({ open, onClose, onAdd }: {
               </Select>
             </div>
           </div>
-          {baseQty && parseFloat(baseQty) > 0 && (
-            <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2 text-xs text-muted-foreground"
-            >
-              Forecast qty: <span className="font-semibold text-primary" style={{ fontFamily: FONT_MONO }}>
-                {Math.round(parseFloat(baseQty) * 1.5 * 1.2 * 1.25)} {unit}
-              </span> <span className="opacity-60">(×1.5 × ×1.2 × ×1.25)</span>
-            </motion.div>
-          )}
+
+          <AnimatePresence>
+            {forecastNum && (
+              <motion.div
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="rounded-lg border px-3 py-2.5 space-y-1.5"
+                style={{
+                  background: coverPct !== null && coverPct < 50 ? "rgb(254 242 242 / 0.7)" :
+                    coverPct !== null && coverPct < 100 ? "rgb(255 251 235 / 0.7)" :
+                    "rgb(240 253 244 / 0.7)",
+                  borderColor: coverPct !== null && coverPct < 50 ? "rgb(252 165 165 / 0.5)" :
+                    coverPct !== null && coverPct < 100 ? "rgb(253 230 138 / 0.5)" :
+                    "rgb(167 243 208 / 0.5)",
+                }}
+              >
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Forecast qty</span>
+                  <span className="font-semibold text-primary" style={{ fontFamily: FONT_MONO }}>
+                    {forecastNum} {unit} <span className="font-normal opacity-50">(×2.25)</span>
+                  </span>
+                </div>
+                {coverPct !== null && (
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Stock cover</span>
+                    <span
+                      className={`font-bold ${coverPct < 50 ? "text-rose-600" : coverPct < 100 ? "text-amber-600" : "text-emerald-600"}`}
+                      style={{ fontFamily: FONT_MONO }}
+                    >
+                      {coverPct}% {coverPct < 50 ? "— reorder now" : coverPct < 100 ? "— low stock" : "— adequate"}
+                    </span>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
             <Button type="submit" size="sm" disabled={!name.trim() || !baseQty || parseFloat(baseQty) < 0}>
@@ -411,6 +530,10 @@ export default function Dashboard() {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [forecastRows, setForecastRows] = useState<ForecastRow[]>(INITIAL_ROWS);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const updateStock = (id: number, stock: number | undefined) => {
+    setForecastRows((prev) => prev.map((r) => r.id === id ? { ...r, stock } : r));
+  };
   const [storeLabel, setStoreLabel] = useState("Andheri West");
   const [isGpsLoading, setIsGpsLoading] = useState(false);
   const [gpsUsed, setGpsUsed] = useState(false);
@@ -596,10 +719,12 @@ export default function Dashboard() {
             <Table>
               <TableHeader className="sticky top-0 z-10">
                 <TableRow className="border-border hover:bg-transparent bg-white/40 dark:bg-black/20">
-                  {["Product", "Base Qty", "Final Qty", "Uplift", "Trend"].map((h, i) => (
+                  {["Product", "Base Qty", "Stock", "Final Qty", "Uplift", "Trend"].map((h, i) => (
                     <TableHead
                       key={h}
-                      className={`text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${i === 1 || i === 2 ? "text-right" : i >= 3 ? "text-center" : ""} ${i === 4 ? "w-16" : i === 3 ? "w-24" : ""}`}
+                      className={`text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${
+                        i === 1 || i === 2 || i === 3 ? "text-right" : i >= 4 ? "text-center" : ""
+                      } ${i === 5 ? "w-16" : i === 4 ? "w-24" : i === 2 ? "w-36" : ""}`}
                       style={{ fontFamily: FONT_SYNE, letterSpacing: "0.08em" }}
                     >
                       {h}
@@ -647,6 +772,9 @@ export default function Dashboard() {
                         </TableCell>
                         <TableCell className="text-right text-sm text-muted-foreground py-3" style={{ fontFamily: FONT_MONO }}>
                           {row.base}
+                        </TableCell>
+                        <TableCell className="text-right py-2.5 w-36">
+                          <StockCell row={row} onUpdate={updateStock} />
                         </TableCell>
                         <TableCell className="text-right py-3">
                           <Tooltip>

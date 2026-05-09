@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Flame, CloudRain, Wallet, AlertTriangle, AlertCircle,
@@ -181,47 +181,107 @@ function AlertCard({ variant, icon: Icon, title, message, color }: {
 function DynamicBackground() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+
+  // Base fill for the viewport
+  const baseFill = isDark ? "hsl(220,28%,12%)" : "hsl(210,40%,97%)";
+
+  const orbs: Array<{ color: string; top?: string; bottom?: string; left?: string; right?: string; w: number; ax: number[]; ay: number[]; dur: number; delay?: number }> = [
+    {
+      color: isDark ? "rgba(20,184,166,0.55)"  : "rgba(13,148,136,0.55)",
+      top: "0%", left: "5%", w: 560,
+      ax: [0, 60, 10, 0], ay: [0, 40, -10, 0],
+      dur: 13,
+    },
+    {
+      color: isDark ? "rgba(139,92,246,0.50)" : "rgba(109,40,217,0.48)",
+      top: "22%", right: "3%", w: 500,
+      ax: [0, -55, -10, 0], ay: [0, 50, 10, 0],
+      dur: 17, delay: 3,
+    },
+    {
+      color: isDark ? "rgba(251,146,60,0.45)" : "rgba(234,88,12,0.45)",
+      bottom: "4%", left: "30%", w: 460,
+      ax: [0, 45, -5, 0], ay: [0, -45, 5, 0],
+      dur: 15, delay: 6,
+    },
+    {
+      color: isDark ? "rgba(52,211,153,0.38)" : "rgba(16,185,129,0.38)",
+      bottom: "8%", left: "-4%", w: 380,
+      ax: [0, 35, 5, 0], ay: [0, -30, -5, 0],
+      dur: 20, delay: 9,
+    },
+  ];
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      <motion.div
-        className={`absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl opacity-30 ${
-          isDark ? "bg-teal-500/20" : "bg-teal-300/40"
-        }`}
-        animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+    <>
+      {/* Fixed base layer — sits below everything, never clipped */}
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 0,
+          backgroundColor: baseFill,
+          pointerEvents: "none",
+        }}
+        aria-hidden
       />
-      <motion.div
-        className={`absolute top-1/3 -right-24 w-80 h-80 rounded-full blur-3xl opacity-20 ${
-          isDark ? "bg-violet-500/20" : "bg-violet-300/35"
-        }`}
-        animate={{ x: [0, -25, 0], y: [0, 30, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
-      <motion.div
-        className={`absolute -bottom-20 left-1/3 w-72 h-72 rounded-full blur-3xl opacity-20 ${
-          isDark ? "bg-orange-500/15" : "bg-orange-200/40"
-        }`}
-        animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-      />
-      <svg className="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grid)" />
-      </svg>
-      <div className="absolute top-20 right-40 opacity-[0.04] rotate-12 select-none pointer-events-none">
-        <ShoppingBasket className="w-24 h-24" />
+      {/* Fixed orb layer — above base, below UI */}
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 1,
+          overflow: "hidden", pointerEvents: "none",
+        }}
+        aria-hidden
+      >
+        {orbs.map((orb, i) => (
+          <motion.div
+            key={i}
+            style={{
+              position: "absolute",
+              borderRadius: "50%",
+              filter: "blur(72px)",
+              width: orb.w,
+              height: orb.w,
+              top: orb.top,
+              bottom: orb.bottom,
+              left: orb.left,
+              right: orb.right,
+              background: `radial-gradient(circle, ${orb.color} 0%, transparent 70%)`,
+            }}
+            animate={{ x: orb.ax, y: orb.ay }}
+            transition={{
+              duration: orb.dur,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: orb.delay ?? 0,
+              times: [0, 0.33, 0.66, 1],
+            }}
+          />
+        ))}
+
+        {/* Dot grid */}
+        <svg
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: isDark ? 0.08 : 0.07 }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.5" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#dots)" />
+        </svg>
+
+        {/* Watermark icons */}
+        <div style={{ position: "absolute", top: 56, right: 130, opacity: isDark ? 0.07 : 0.09 }} className="rotate-12 select-none text-foreground">
+          <ShoppingBasket className="w-28 h-28" />
+        </div>
+        <div style={{ position: "absolute", bottom: 72, left: 72, opacity: isDark ? 0.06 : 0.08 }} className="-rotate-6 select-none text-foreground">
+          <Store className="w-24 h-24" />
+        </div>
+        <div style={{ position: "absolute", top: "44%", right: 44, opacity: isDark ? 0.06 : 0.08 }} className="rotate-6 select-none text-foreground">
+          <TrendingUp className="w-20 h-20" />
+        </div>
       </div>
-      <div className="absolute bottom-24 left-24 opacity-[0.04] -rotate-6 select-none pointer-events-none">
-        <Store className="w-20 h-20" />
-      </div>
-      <div className="absolute top-1/2 right-16 opacity-[0.04] rotate-6 select-none pointer-events-none">
-        <TrendingUp className="w-16 h-16" />
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -245,11 +305,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="relative flex flex-col h-screen max-h-screen bg-background text-foreground overflow-hidden font-sans">
-      <DynamicBackground />
+    <div className="relative flex flex-col h-screen max-h-screen text-foreground overflow-hidden font-sans" style={{ zIndex: 2 }}>
 
       {/* Zone 1 — Filter bar */}
-      <header className="relative z-10 flex-none h-14 border-b border-border bg-card/80 backdrop-blur-sm flex items-center px-5 gap-4 shadow-sm">
+      <header className="relative z-10 flex-none h-14 border-b border-border bg-white/20 dark:bg-black/25 backdrop-blur-md flex items-center px-5 gap-4">
         <div className="flex items-center gap-2 text-primary font-bold tracking-tight text-sm shrink-0">
           <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center shadow-sm">
             <TrendingUp className="w-4 h-4 text-primary-foreground" />
@@ -329,7 +388,7 @@ export default function Dashboard() {
       <main className="relative z-10 flex-1 flex min-h-0">
 
         {/* Left: Context Panel */}
-        <div className="w-72 border-r border-border bg-sidebar/60 backdrop-blur-sm p-4 flex flex-col gap-4 overflow-y-auto">
+        <div className="w-72 border-r border-border bg-white/25 dark:bg-black/30 backdrop-blur-md p-4 flex flex-col gap-4 overflow-y-auto">
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Active Signals</h2>
@@ -356,7 +415,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right: Forecast Table */}
-        <div className="flex-1 p-5 flex flex-col min-h-0 bg-background/40 backdrop-blur-sm">
+        <div className="flex-1 p-5 flex flex-col min-h-0 bg-transparent backdrop-blur-none">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold tracking-tight">Today's Forecast</h1>
@@ -370,7 +429,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto rounded-xl border border-border shadow-sm bg-card/80 backdrop-blur-sm">
+          <div className="flex-1 overflow-auto rounded-xl border border-border shadow-sm bg-white/30 dark:bg-black/30 backdrop-blur-md">
             <Table>
               <TableHeader className="sticky top-0 z-10">
                 <TableRow className="border-border hover:bg-transparent bg-muted/50">
@@ -495,7 +554,7 @@ export default function Dashboard() {
       </main>
 
       {/* Zone 3 — Alerts strip */}
-      <footer className="relative z-10 flex-none border-t border-border bg-card/70 backdrop-blur-sm px-5 py-3 flex gap-3">
+      <footer className="relative z-10 flex-none border-t border-border bg-white/25 dark:bg-black/30 backdrop-blur-md px-5 py-3 flex gap-3">
         <AlertCard
           variant="warn"
           icon={AlertTriangle}
@@ -511,6 +570,9 @@ export default function Dashboard() {
           color="text-rose-600 dark:text-rose-400"
         />
       </footer>
+
+      {/* Animated background — fixed layers sit below the dashboard via z-index */}
+      <DynamicBackground />
     </div>
   );
 }

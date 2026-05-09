@@ -211,6 +211,40 @@
   --shadow-2xl: 0px 24px 48px 0px rgba(0,0,0, 0.45);
 }
 
+/* Animatable gradient-centre custom properties */
+@property --o1x { syntax: '<percentage>'; inherits: false; initial-value: 10%; }
+@property --o1y { syntax: '<percentage>'; inherits: false; initial-value: 12%; }
+@property --o2x { syntax: '<percentage>'; inherits: false; initial-value: 88%; }
+@property --o2y { syntax: '<percentage>'; inherits: false; initial-value: 45%; }
+@property --o3x { syntax: '<percentage>'; inherits: false; initial-value: 48%; }
+@property --o3y { syntax: '<percentage>'; inherits: false; initial-value: 90%; }
+
+@keyframes orbs-drift {
+  0%   { --o1x: 10%; --o1y: 12%; --o2x: 88%; --o2y: 45%; --o3x: 48%; --o3y: 90%; }
+  25%  { --o1x: 22%; --o1y: 28%; --o2x: 72%; --o2y: 62%; --o3x: 58%; --o3y: 72%; }
+  50%  { --o1x: 8%;  --o1y: 20%; --o2x: 90%; --o2y: 35%; --o3x: 40%; --o3y: 85%; }
+  75%  { --o1x: 18%; --o1y: 5%;  --o2x: 78%; --o2y: 55%; --o3x: 55%; --o3y: 78%; }
+  100% { --o1x: 10%; --o1y: 12%; --o2x: 88%; --o2y: 45%; --o3x: 48%; --o3y: 90%; }
+}
+
+.orb-bg-light {
+  background-color: hsl(210, 40%, 97%);
+  background-image:
+    radial-gradient(ellipse 55% 50% at var(--o1x) var(--o1y), rgba(13,148,136,0.50) 0%, transparent 68%),
+    radial-gradient(ellipse 52% 52% at var(--o2x) var(--o2y), rgba(109,40,217,0.38) 0%, transparent 68%),
+    radial-gradient(ellipse 48% 44% at var(--o3x) var(--o3y), rgba(234,88,12,0.38)  0%, transparent 68%);
+  animation: orbs-drift 18s ease-in-out infinite;
+}
+
+.orb-bg-dark {
+  background-color: hsl(220, 28%, 12%);
+  background-image:
+    radial-gradient(ellipse 55% 50% at var(--o1x) var(--o1y), rgba(20,184,166,0.42) 0%, transparent 68%),
+    radial-gradient(ellipse 52% 52% at var(--o2x) var(--o2y), rgba(139,92,246,0.35) 0%, transparent 68%),
+    radial-gradient(ellipse 48% 44% at var(--o3x) var(--o3y), rgba(251,146,60,0.32)  0%, transparent 68%);
+  animation: orbs-drift 18s ease-in-out infinite;
+}
+
 @layer base {
   * {
     @apply border-border;

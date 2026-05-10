@@ -717,72 +717,6 @@ const INITIAL_LOCATIONS: Record<string, string> = {
   Srinagar: "Jammu and Kashmir",
 };
 
-// ── Sparkline Data (7-day demo history per product id) ──────────────────────
-const SPARKLINE_DATA: Record<number, number[]> = {
-  1: [18, 20, 19, 22, 24, 21, 20],
-  2: [4, 3, 4, 5, 4, 4, 4],
-  3: [12, 14, 13, 16, 15, 17, 15],
-  4: [10, 10, 10, 9, 10, 10, 10],
-  5: [2, 3, 3, 4, 4, 4, 4],
-  6: [22, 24, 25, 23, 26, 25, 25],
-};
-
-function MiniSparkline({
-  productId,
-  change,
-}: {
-  productId: number;
-  change: string;
-}) {
-  const raw = SPARKLINE_DATA[productId] ?? [1, 1, 1, 1, 1, 1, 1];
-  const W = 64,
-    H = 28,
-    pad = 3;
-  const min = Math.min(...raw),
-    max = Math.max(...raw);
-  const range = max - min || 1;
-  const pts = raw.map((v, i) => {
-    const x = pad + (i / (raw.length - 1)) * (W - pad * 2);
-    const y = H - pad - ((v - min) / range) * (H - pad * 2);
-    return `${x},${y}`;
-  });
-  const polyPts = pts.join(" ");
-  const fillPts = `${pad},${H} ${polyPts} ${W - pad},${H}`;
-  const color =
-    change === "up" ? "#10b981" : change === "down" ? "#3b82f6" : "#9ca3af";
-  const gradId = `sg-${productId}`;
-  return (
-    <svg
-      width={W}
-      height={H}
-      viewBox={`0 0 ${W} ${H}`}
-      style={{ overflow: "visible" }}
-    >
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <polygon points={fillPts} fill={`url(#${gradId})`} />
-      <polyline
-        points={polyPts}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle
-        cx={pts[pts.length - 1].split(",")[0]}
-        cy={pts[pts.length - 1].split(",")[1]}
-        r="2.5"
-        fill={color}
-      />
-    </svg>
-  );
-}
-
 // ── Floating Glass Bubbles ───────────────────────────────────────────────────
 type GlassBubble = {
   id: string;
@@ -1667,7 +1601,7 @@ export default function Dashboard() {
                     { label: "Stock", align: "text-right", w: "w-36" },
                     { label: "Final Qty", align: "text-right" },
                     { label: "Uplift", align: "text-center", w: "w-20" },
-                    { label: "7-Day", align: "text-center", w: "w-20" },
+                    { label: "Days Left", align: "text-center", w: "w-24" },
                     { label: "", align: "text-center", w: "w-10" },
                   ].map((h) => (
                     <TableHead
@@ -1858,14 +1792,53 @@ export default function Dashboard() {
                           )}
                         </TableCell>
 
-                        {/* ── 7-Day Sparkline ── */}
-                        <TableCell className="text-center py-2 w-20">
-                          <div className="flex items-center justify-center">
-                            <MiniSparkline
-                              productId={row.id}
-                              change={row.change}
-                            />
-                          </div>
+                        {/* ── Days Left ── */}
+                        <TableCell className="text-center py-3 w-24">
+                          {(() => {
+                            if (
+                              row.stock === undefined ||
+                              row.finalNum === 0 ||
+                              !row.responsive
+                            ) {
+                              return (
+                                <span className="text-xs text-muted-foreground font-mono">
+                                  —
+                                </span>
+                              );
+                            }
+
+                            const dailyRate = row.finalNum / 7;
+                            const daysLeft = row.stock / dailyRate;
+
+                            let badgeStyle =
+                              "bg-emerald-100/80 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20";
+                            let dotColor = "bg-emerald-500";
+
+                            if (daysLeft < 3) {
+                              badgeStyle =
+                                "bg-rose-100/80 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20";
+                              dotColor = "bg-rose-500 animate-pulse";
+                            } else if (daysLeft < 6) {
+                              badgeStyle =
+                                "bg-amber-100/80 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 border-amber-200/50 dark:border-amber-500/20";
+                              dotColor = "bg-amber-500";
+                            }
+
+                            return (
+                              <div className="flex justify-center">
+                                <Badge
+                                  variant="outline"
+                                  className={`h-6 px-2 flex items-center gap-1.5 ${badgeStyle}`}
+                                  style={{ fontFamily: FONT_MONO }}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${dotColor}`}
+                                  />
+                                  {daysLeft.toFixed(1)}d
+                                </Badge>
+                              </div>
+                            );
+                          })()}
                         </TableCell>
 
                         {/* ── Action ── */}

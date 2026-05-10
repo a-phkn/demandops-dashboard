@@ -240,108 +240,69 @@ const INITIAL_LOCATIONS: Record<string, string> = {
   "Srinagar": "Jammu and Kashmir"
 };
 
-// ── Floating Background Objects ─────────────────────────────────────────────
-const FLOAT_OBJECTS = [
-  {
-    id: "barchart",
-    jsx: (stroke: string) => (
-      <svg width="64" height="52" viewBox="0 0 64 52" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="28" width="10" height="20" rx="2" />
-        <rect x="20" y="16" width="10" height="32" rx="2" />
-        <rect x="36" y="8" width="10" height="40" rx="2" />
-        <rect x="52" y="20" width="10" height="28" rx="2" />
-        <line x1="0" y1="49" x2="64" y2="49" strokeWidth="1.2" />
-      </svg>
-    ),
-    top: "10%", left: "6%", ax: [0, 18, 4, 0], ay: [0, 12, -6, 0], dur: 32, rot: -8,
-  },
-  {
-    id: "trendline",
-    jsx: (stroke: string) => (
-      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="4,38 16,28 28,32 40,16 52,20 68,6" />
-        <circle cx="68" cy="6" r="3" fill={stroke} />
-        <line x1="62" y1="10" x2="72" y2="2" strokeWidth="1.2" strokeDasharray="2 2" />
-      </svg>
-    ),
-    top: "62%", left: "3%", ax: [0, 14, -4, 0], ay: [0, -18, 2, 0], dur: 38, rot: 6,
-  },
-  {
-    id: "package",
-    jsx: (stroke: string) => (
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M26 4L48 16v20L26 48 4 36V16L26 4z" />
-        <line x1="26" y1="4" x2="26" y2="48" />
-        <line x1="4" y1="16" x2="48" y2="16" />
-        <path d="M16 10l10 6 10-6" />
-      </svg>
-    ),
-    top: "18%", right: "7%", ax: [0, -16, -2, 0], ay: [0, 20, 8, 0], dur: 42, rot: 12,
-  },
-  {
-    id: "target",
-    jsx: (stroke: string) => (
-      <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="28" cy="28" r="24" />
-        <circle cx="28" cy="28" r="14" />
-        <circle cx="28" cy="28" r="5" />
-        <line x1="28" y1="4" x2="28" y2="14" />
-        <line x1="28" y1="42" x2="28" y2="52" />
-        <line x1="4" y1="28" x2="14" y2="28" />
-        <line x1="42" y1="28" x2="52" y2="28" />
-      </svg>
-    ),
-    bottom: "22%", right: "5%", ax: [0, -20, 4, 0], ay: [0, -14, -4, 0], dur: 35, rot: 0,
-  },
-  {
-    id: "layers",
-    jsx: (stroke: string) => (
-      <svg width="62" height="48" viewBox="0 0 62 48" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M31 4L58 18 31 32 4 18 31 4z" />
-        <path d="M4 28l27 14 27-14" />
-        <path d="M4 38l27 14 27-14" opacity="0.5" />
-      </svg>
-    ),
-    top: "45%", left: "45%", ax: [0, 10, -8, 0], ay: [0, -20, -2, 0], dur: 28, rot: -5,
-  },
-  {
-    id: "piechart",
-    jsx: (stroke: string) => (
-      <svg width="54" height="54" viewBox="0 0 54 54" fill="none" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M27 4 A23 23 0 0 1 50 27 L27 27 Z" />
-        <path d="M50 27 A23 23 0 0 1 11 44 L27 27 Z" />
-        <path d="M11 44 A23 23 0 1 1 27 4 L27 27 Z" opacity="0.6" />
-      </svg>
-    ),
-    bottom: "12%", left: "20%", ax: [0, 22, 6, 0], ay: [0, -10, 4, 0], dur: 45, rot: 15,
-  },
-  {
-    id: "arrow-up",
-    jsx: (stroke: string) => (
-      <svg width="36" height="52" viewBox="0 0 36 52" fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="18" y1="48" x2="18" y2="8" />
-        <polyline points="6,20 18,8 30,20" />
-        <line x1="10" y1="36" x2="26" y2="36" strokeWidth="1.2" strokeDasharray="2 3" opacity="0.6" />
-        <line x1="10" y1="44" x2="26" y2="44" strokeWidth="1.2" strokeDasharray="2 3" opacity="0.3" />
-      </svg>
-    ),
-    top: "30%", right: "20%", ax: [0, -10, 2, 0], ay: [0, 16, -8, 0], dur: 30, rot: -10,
-  },
-  {
-    id: "grid",
-    jsx: (stroke: string) => (
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" stroke={stroke} strokeWidth="1.4" strokeLinecap="round">
-        <line x1="0" y1="20" x2="60" y2="20" />
-        <line x1="0" y1="40" x2="60" y2="40" />
-        <line x1="20" y1="0" x2="20" y2="60" />
-        <line x1="40" y1="0" x2="40" y2="60" />
-        <circle cx="20" cy="20" r="3" fill={stroke} />
-        <circle cx="40" cy="40" r="3" fill={stroke} />
-        <circle cx="20" cy="40" r="2" fill={stroke} opacity="0.5" />
-      </svg>
-    ),
-    top: "75%", right: "30%", ax: [0, -12, -4, 0], ay: [0, 10, 6, 0], dur: 50, rot: 20,
-  },
+// ── Sparkline Data (7-day demo history per product id) ──────────────────────
+const SPARKLINE_DATA: Record<number, number[]> = {
+  1: [18, 20, 19, 22, 24, 21, 20],
+  2: [4,  3,  4,  5,  4,  4,  4],
+  3: [12, 14, 13, 16, 15, 17, 15],
+  4: [10, 10, 10,  9, 10, 10, 10],
+  5: [2,  3,  3,  4,  4,  4,  4],
+  6: [22, 24, 25, 23, 26, 25, 25],
+};
+
+function MiniSparkline({ productId, change }: { productId: number; change: string }) {
+  const raw = SPARKLINE_DATA[productId] ?? [1, 1, 1, 1, 1, 1, 1];
+  const W = 64, H = 28, pad = 3;
+  const min = Math.min(...raw), max = Math.max(...raw);
+  const range = max - min || 1;
+  const pts = raw.map((v, i) => {
+    const x = pad + (i / (raw.length - 1)) * (W - pad * 2);
+    const y = H - pad - ((v - min) / range) * (H - pad * 2);
+    return `${x},${y}`;
+  });
+  const polyPts = pts.join(" ");
+  const fillPts = `${pad},${H} ${polyPts} ${W - pad},${H}`;
+  const color = change === "up" ? "#10b981" : change === "down" ? "#3b82f6" : "#9ca3af";
+  const gradId = `sg-${productId}`;
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ overflow: "visible" }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <polygon points={fillPts} fill={`url(#${gradId})`} />
+      <polyline points={polyPts} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={pts[pts.length - 1].split(",")[0]} cy={pts[pts.length - 1].split(",")[1]} r="2.5" fill={color} />
+    </svg>
+  );
+}
+
+// ── Floating Glass Bubbles ───────────────────────────────────────────────────
+type GlassBubble = {
+  id: string;
+  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
+  size: number;
+  iconSize: number;
+  lightBg: string;
+  darkBg: string;
+  lightBorder: string;
+  darkBorder: string;
+  iconColor: string;
+  top?: string; bottom?: string; left?: string; right?: string;
+  ax: number[]; ay: number[]; dur: number; rot: number;
+};
+
+const GLASS_BUBBLES: GlassBubble[] = [
+  { id: "b1", Icon: BarChart2,  size: 88,  iconSize: 32, lightBg: "rgba(219,234,254,0.55)", darkBg: "rgba(37,99,235,0.18)",  lightBorder: "rgba(147,197,253,0.6)",  darkBorder: "rgba(96,165,250,0.25)",  iconColor: "#3b82f6", top: "8%",   left: "5%",   ax: [0,20,6,0],   ay: [0,14,-8,0],  dur: 32, rot: 0 },
+  { id: "b2", Icon: TrendingUp, size: 76,  iconSize: 28, lightBg: "rgba(209,250,229,0.55)", darkBg: "rgba(5,150,105,0.18)",   lightBorder: "rgba(110,231,183,0.6)", darkBorder: "rgba(52,211,153,0.25)", iconColor: "#10b981", top: "60%",  left: "2%",   ax: [0,16,-4,0],  ay: [0,-18,4,0],  dur: 38, rot: 0 },
+  { id: "b3", Icon: Package,    size: 96,  iconSize: 36, lightBg: "rgba(254,243,199,0.55)", darkBg: "rgba(217,119,6,0.18)",   lightBorder: "rgba(252,211,77,0.6)",  darkBorder: "rgba(251,191,36,0.25)", iconColor: "#f59e0b", top: "12%",  right: "6%",  ax: [0,-18,-4,0], ay: [0,20,6,0],   dur: 42, rot: 0 },
+  { id: "b4", Icon: Target,     size: 80,  iconSize: 30, lightBg: "rgba(252,231,243,0.55)", darkBg: "rgba(190,24,93,0.15)",   lightBorder: "rgba(249,168,212,0.6)", darkBorder: "rgba(244,114,182,0.22)",iconColor: "#ec4899", bottom: "20%", right: "4%", ax: [0,-22,4,0],  ay: [0,-16,-4,0], dur: 35, rot: 0 },
+  { id: "b5", Icon: Layers,     size: 70,  iconSize: 26, lightBg: "rgba(237,233,254,0.55)", darkBg: "rgba(124,58,237,0.18)",  lightBorder: "rgba(196,181,253,0.6)", darkBorder: "rgba(167,139,250,0.25)",iconColor: "#8b5cf6", top: "42%",  left: "43%",  ax: [0,12,-6,0],  ay: [0,-22,2,0],  dur: 28, rot: 0 },
+  { id: "b6", Icon: Activity,   size: 82,  iconSize: 30, lightBg: "rgba(255,237,213,0.55)", darkBg: "rgba(234,88,12,0.18)",   lightBorder: "rgba(253,186,116,0.6)", darkBorder: "rgba(251,146,60,0.25)", iconColor: "#f97316", bottom: "10%", left: "18%", ax: [0,24,8,0],   ay: [0,-12,4,0],  dur: 45, rot: 0 },
+  { id: "b7", Icon: TrendingUp, size: 64,  iconSize: 24, lightBg: "rgba(204,251,241,0.55)", darkBg: "rgba(13,148,136,0.18)",  lightBorder: "rgba(94,234,212,0.6)", darkBorder: "rgba(45,212,191,0.25)", iconColor: "#0d9488", top: "28%",  right: "18%", ax: [0,-12,2,0],  ay: [0,18,-6,0],  dur: 30, rot: 0 },
+  { id: "b8", Icon: BarChart2,  size: 72,  iconSize: 26, lightBg: "rgba(219,234,254,0.50)", darkBg: "rgba(30,64,175,0.16)",   lightBorder: "rgba(147,197,253,0.5)", darkBorder: "rgba(96,165,250,0.20)", iconColor: "#1d4ed8", bottom: "32%", right: "28%",ax: [0,-14,-4,0], ay: [0,12,6,0],   dur: 50, rot: 0 },
 ];
 
 function DynamicBackground() {
@@ -349,18 +310,16 @@ function DynamicBackground() {
   const isDark = theme === "dark";
 
   const orbs = isDark ? [
-    { color: "rgba(30,58,138,0.80)", top: "0%", left: "0%", w: 620, ax: [0, 40, 10, 0], ay: [0, 30, -8, 0], dur: 20 },
-    { color: "rgba(212,167,67,0.28)", top: "10%", right: "0%", w: 500, ax: [0, -40, -8, 0], ay: [0, 40, 8, 0], dur: 26, delay: 4 },
-    { color: "rgba(15,23,42,0.90)", bottom: "0%", left: "25%", w: 560, ax: [0, 30, -4, 0], ay: [0, -30, 4, 0], dur: 22, delay: 8 },
-    { color: "rgba(37,99,235,0.22)", bottom: "10%", right: "10%", w: 380, ax: [0, 25, 5, 0], ay: [0, -25, -5, 0], dur: 30, delay: 12 },
+    { color: "rgba(37,99,235,0.45)",  top: "-5%",  left: "-5%",  w: 580, ax: [0,40,10,0],  ay: [0,30,-8,0],  dur: 20 },
+    { color: "rgba(212,167,67,0.38)", top: "5%",   right: "-5%", w: 480, ax: [0,-38,-8,0], ay: [0,40,8,0],   dur: 26, delay: 4 },
+    { color: "rgba(124,58,237,0.35)", bottom: "0%",left: "22%",  w: 520, ax: [0,30,-4,0],  ay: [0,-30,4,0],  dur: 22, delay: 8 },
+    { color: "rgba(13,148,136,0.30)", bottom: "5%",right: "8%",  w: 400, ax: [0,22,6,0],   ay: [0,-22,-4,0], dur: 30, delay: 12 },
   ] : [
-    { color: "rgba(191,219,254,0.90)", top: "-5%", left: "-5%", w: 600, ax: [0, 35, 8, 0], ay: [0, 25, -6, 0], dur: 20 },
-    { color: "rgba(254,243,199,0.85)", top: "5%", right: "-5%", w: 500, ax: [0, -30, -6, 0], ay: [0, 35, 6, 0], dur: 26, delay: 4 },
-    { color: "rgba(219,234,254,0.80)", bottom: "0%", left: "20%", w: 520, ax: [0, 25, -4, 0], ay: [0, -28, 4, 0], dur: 22, delay: 8 },
-    { color: "rgba(255,237,213,0.70)", bottom: "5%", right: "5%", w: 360, ax: [0, 22, 4, 0], ay: [0, -22, -4, 0], dur: 30, delay: 12 },
+    { color: "rgba(147,197,253,0.70)", top: "-5%",  left: "-5%",  w: 560, ax: [0,35,8,0],  ay: [0,25,-6,0],  dur: 20 },
+    { color: "rgba(252,211,77,0.60)",  top: "5%",   right: "-5%", w: 480, ax: [0,-30,-6,0],ay: [0,35,6,0],   dur: 26, delay: 4 },
+    { color: "rgba(196,181,253,0.55)", bottom: "0%",left: "20%",  w: 500, ax: [0,25,-4,0], ay: [0,-28,4,0],  dur: 22, delay: 8 },
+    { color: "rgba(110,231,183,0.50)", bottom: "5%",right: "5%",  w: 360, ax: [0,22,4,0],  ay: [0,-22,-4,0], dur: 30, delay: 12 },
   ];
-
-  const shapeStroke = isDark ? "rgba(212,167,67,0.13)" : "rgba(30,58,138,0.10)";
 
   return (
     <>
@@ -368,28 +327,30 @@ function DynamicBackground() {
         style={{
           position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
           background: isDark
-            ? "linear-gradient(135deg, hsl(222,47%,6%) 0%, hsl(220,45%,8%) 50%, hsl(218,42%,7%) 100%)"
-            : "linear-gradient(135deg, hsl(218,40%,94%) 0%, hsl(215,35%,96%) 50%, hsl(220,38%,93%) 100%)",
+            ? "hsl(222,47%,5%)"
+            : "hsl(218,38%,93%)",
         }}
         aria-hidden
       />
       <div style={{ position: "fixed", inset: 0, zIndex: 1, overflow: "hidden", pointerEvents: "none" }} aria-hidden>
+        {/* Soft ambient orbs — blurred colour washes */}
         {orbs.map((orb, i) => (
           <motion.div
             key={i}
             style={{
-              position: "absolute", borderRadius: "50%", filter: "blur(80px)",
+              position: "absolute", borderRadius: "50%", filter: "blur(90px)",
               width: orb.w, height: orb.w,
               top: (orb as any).top, bottom: (orb as any).bottom,
               left: (orb as any).left, right: (orb as any).right,
               background: `radial-gradient(circle, ${orb.color} 0%, transparent 70%)`,
             }}
             animate={{ x: orb.ax, y: orb.ay }}
-            transition={{ duration: orb.dur, repeat: Infinity, ease: "easeInOut", delay: (orb as any).delay ?? 0, times: [0, 0.33, 0.66, 1] }}
+            transition={{ duration: orb.dur, repeat: Infinity, ease: "easeInOut", delay: (orb as any).delay ?? 0, times: [0,0.33,0.66,1] }}
           />
         ))}
 
-        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: isDark ? 0.06 : 0.05 }}>
+        {/* Fine dot-grid overlay */}
+        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: isDark ? 0.08 : 0.07 }}>
           <defs>
             <pattern id="finegrid" width="28" height="28" patternUnits="userSpaceOnUse">
               <circle cx="1.5" cy="1.5" r="1" fill="currentColor" />
@@ -398,19 +359,35 @@ function DynamicBackground() {
           <rect width="100%" height="100%" fill="url(#finegrid)" />
         </svg>
 
-        {FLOAT_OBJECTS.map((obj) => (
+        {/* Frosted glass bubbles with themed icons */}
+        {GLASS_BUBBLES.map((b) => (
           <motion.div
-            key={obj.id}
+            key={b.id}
             style={{
               position: "absolute",
-              top: (obj as any).top, bottom: (obj as any).bottom,
-              left: (obj as any).left, right: (obj as any).right,
-              rotate: obj.rot,
+              top: b.top, bottom: b.bottom, left: b.left, right: b.right,
+              width: b.size, height: b.size,
+              borderRadius: "50%",
+              background: isDark ? b.darkBg : b.lightBg,
+              border: `1.5px solid ${isDark ? b.darkBorder : b.lightBorder}`,
+              boxShadow: isDark
+                ? `0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.10)`
+                : `0 8px 32px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.80), inset 0 -1px 0 rgba(0,0,0,0.04)`,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}
-            animate={{ x: obj.ax, y: obj.ay, rotate: [obj.rot, obj.rot + 5, obj.rot - 4, obj.rot] }}
-            transition={{ duration: obj.dur, repeat: Infinity, ease: "easeInOut", times: [0, 0.33, 0.66, 1] }}
+            animate={{ x: b.ax, y: b.ay, scale: [1, 1.04, 0.97, 1] }}
+            transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut", times: [0,0.33,0.66,1] }}
           >
-            {obj.jsx(shapeStroke)}
+            {/* Inner highlight shimmer */}
+            <div style={{
+              position: "absolute", top: "10%", left: "15%", width: "40%", height: "28%",
+              borderRadius: "50%",
+              background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.65)",
+              filter: "blur(4px)",
+            }} />
+            <b.Icon size={b.iconSize} strokeWidth={1.5} color={isDark ? b.iconColor : b.iconColor} />
           </motion.div>
         ))}
       </div>
@@ -679,12 +656,20 @@ export default function Dashboard() {
             <Table>
               <TableHeader className="sticky top-0 z-10">
                 <TableRow className="border-white/15 dark:border-white/8 hover:bg-transparent bg-white/30 dark:bg-white/6">
-                  {["Product", "Base Qty", "Stock", "Final Qty", "Uplift", "Trend"].map((h, i) => (
+                  {[
+                    { label: "Product", align: "" },
+                    { label: "Base Qty", align: "text-right" },
+                    { label: "Stock", align: "text-right", w: "w-36" },
+                    { label: "Final Qty", align: "text-right" },
+                    { label: "Uplift", align: "text-center", w: "w-20" },
+                    { label: "7-Day", align: "text-center", w: "w-20" },
+                    { label: "", align: "text-center", w: "w-10" },
+                  ].map((h) => (
                     <TableHead
-                      key={h}
-                      className={`text-[9px] font-bold uppercase tracking-widest text-muted-foreground ${i === 1 || i === 2 || i === 3 ? "text-right" : i >= 4 ? "text-center" : ""} ${i === 5 ? "w-16" : i === 4 ? "w-24" : i === 2 ? "w-36" : ""}`}
+                      key={h.label}
+                      className={`text-[9px] font-bold uppercase tracking-widest text-muted-foreground ${h.align} ${h.w ?? ""}`}
                       style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.10em" }}
-                    >{h}</TableHead>
+                    >{h.label}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -703,16 +688,48 @@ export default function Dashboard() {
                         className={`group border-white/10 dark:border-white/6 transition-colors cursor-pointer table-row ${isSel ? "bg-primary/8 hover:bg-primary/12" : "hover:bg-white/20 dark:hover:bg-white/6"}`}
                         onClick={() => setSelectedRow(isSel ? null : row.id)}
                       >
+                        {/* ── Product Cell ── */}
                         <TableCell className="py-3">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-sm" style={{ fontFamily: FONT_DISPLAY }}>{row.product}</span>
-                            {row.risk && <Badge variant={row.risk === "High Risk" ? "destructive" : "outline"} className={`h-4 px-1.5 text-[9px] uppercase font-bold ${row.risk === "High Risk" ? "animate-pulse" : "bg-amber-100/80 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20"}`}>{row.risk}</Badge>}
-                            {row.expiry && <Badge variant="outline" className="h-4 px-1.5 text-[9px] uppercase font-bold border-amber-400/50 text-amber-600 dark:text-amber-400 bg-amber-50/80 dark:bg-amber-500/10">{row.expiry}</Badge>}
-                            {row.isNew && <Badge className="h-4 px-1.5 text-[9px] uppercase font-bold bg-primary/15 text-primary border-primary/25 hover:bg-primary/15">NEW</Badge>}
+                          <div className="flex items-center gap-2.5">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-sm leading-none" style={{ fontFamily: FONT_DISPLAY }}>{row.product}</span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {/* High Risk — pulsing destructive badge */}
+                                {row.risk === "High Risk" && (
+                                  <Badge variant="destructive" className="h-3.5 px-1.5 text-[8px] uppercase font-bold tracking-wider animate-pulse">
+                                    ⚠ High Risk
+                                  </Badge>
+                                )}
+                                {/* Med Risk — dot + text pill, no border badge */}
+                                {row.risk === "Med Risk" && (
+                                  <span className="inline-flex items-center gap-1 h-3.5 px-1.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-700 dark:text-amber-300">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                                    Medium
+                                  </span>
+                                )}
+                                {row.expiry && (
+                                  <span className="inline-flex items-center gap-1 h-3.5 px-1.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-orange-400/15 text-orange-600 dark:text-orange-400">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+                                    Expiry
+                                  </span>
+                                )}
+                                {row.isNew && (
+                                  <span className="inline-flex items-center h-3.5 px-1.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-primary/15 text-primary">
+                                    New
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
+
+                        {/* ── Base Qty ── */}
                         <TableCell className="text-right text-sm text-muted-foreground py-3" style={{ fontFamily: FONT_MONO }}>{row.base}</TableCell>
+
+                        {/* ── Stock ── */}
                         <TableCell className="text-right py-2.5 w-36"><StockCell row={row} onUpdate={updateStock} /></TableCell>
+
+                        {/* ── Final Qty ── */}
                         <TableCell className="text-right py-3">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -743,22 +760,32 @@ export default function Dashboard() {
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell className="text-center py-3">
+
+                        {/* ── Uplift ── */}
+                        <TableCell className="text-center py-3 w-20">
                           {pct !== null ? (
                             <span className={`text-xs font-semibold ${pct > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`} style={{ fontFamily: FONT_MONO }}>
                               {pct > 0 ? `+${pct}%` : `${pct}%`}
                             </span>
                           ) : <span className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>—</span>}
                         </TableCell>
-                        <TableCell className="text-center py-3">
-                          <div className="flex items-center justify-center gap-2 group">
-                            {row.change === "up" && <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100/80 dark:bg-emerald-500/15"><ArrowUp className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /></span>}
-                            {row.change === "neutral" && <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted/60"><ArrowRight className="w-3 h-3 text-muted-foreground" /></span>}
-                            {row.change === "down" && <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-sky-100/80 dark:bg-sky-500/15"><ChevronUp className="w-3 h-3 text-sky-600 dark:text-sky-400 rotate-180" /></span>}
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteProduct(row.id); }} className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-50/80 dark:hover:bg-rose-500/10 rounded-md transition-colors opacity-0 group-hover:opacity-100" title="Delete Product">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+
+                        {/* ── 7-Day Sparkline ── */}
+                        <TableCell className="text-center py-2 w-20">
+                          <div className="flex items-center justify-center">
+                            <MiniSparkline productId={row.id} change={row.change} />
                           </div>
+                        </TableCell>
+
+                        {/* ── Action ── */}
+                        <TableCell className="text-center py-3 w-10">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteProduct(row.id); }}
+                            className="p-1.5 text-muted-foreground/40 hover:text-rose-500 hover:bg-rose-50/80 dark:hover:bg-rose-500/10 rounded-md transition-all opacity-0 group-hover:opacity-100"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </TableCell>
                       </motion.tr>
                     );
